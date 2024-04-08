@@ -1,5 +1,6 @@
 import 'package:calculator/components/button_row.dart';
 import 'package:flutter/material.dart';
+import 'package:calculator/functions/calculator_functions.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title});
@@ -10,18 +11,23 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _val = "10 + 10";
+  String calculatorVal = "";
 
-  final List <String> row_1 = ["AC", "()", "%", "÷"];
+  final List <String> row_1 = ["AC", "&", "%", "÷"];
   final List <String> row_2 = ["7", "8", "9", "X"];
   final List <String> row_3 = ["6", "5", "4", "-"];
   final List <String> row_4 = ["3", "2", "1", "+"];
   final List <String> row_5 = ["0", ".", "DEL", "="];
 
+  void handleInput(BuildContext context, String value) {
+    setState(() {
+      calculatorVal = CalculatorLogic.handleInput(context, value, calculatorVal);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme!.inversePrimary,
         title: Text(widget.title),
@@ -35,7 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Expanded(
                   child: Card(
                     child: Text(
-                      _val,
+                      calculatorVal,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 30
@@ -45,13 +51,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 )
               ],
             ),
-          CalculatorButtonRow(row_1),
-          CalculatorButtonRow(row_2),
-          CalculatorButtonRow(row_3),
-          CalculatorButtonRow(row_4),
-          CalculatorButtonRow(row_5),
+          CalculatorButtonRow(row_1, calculatorVal, handleInput),
+          CalculatorButtonRow(row_2, calculatorVal, handleInput),
+          CalculatorButtonRow(row_3, calculatorVal, handleInput),
+          CalculatorButtonRow(row_4, calculatorVal, handleInput),
+          CalculatorButtonRow(row_5, calculatorVal, handleInput),
         ],
       ),
     );
   }
+
+  
 }
