@@ -1,4 +1,5 @@
 import 'package:calculator/screens/Calculator.dart';
+import 'package:calculator/screens/Converter.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -16,8 +17,12 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Calculator'),
       debugShowCheckedModeBanner: false,
+      initialRoute: '/',
+      routes : {
+        '/': (context) =>  const MyHomePage(title: 'Calculator'),
+        '/convert': (context) => Converter(),
+      }
     );
   }
 }

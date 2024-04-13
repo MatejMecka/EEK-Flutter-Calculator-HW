@@ -31,6 +31,15 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme!.inversePrimary,
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/convert');
+            }, 
+            icon: const Icon(Icons.straighten),
+            tooltip: "Convert from Miles to Kilometers",
+            )
+        ],
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
