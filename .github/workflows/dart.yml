@@ -46,7 +46,8 @@ jobs:
         run: flutter build appbundle --release
 
       - name: Sign Android App Bundle
-        run: jarsigner -keystore $RUNNER_TEMP/my_production.keystore -storepass ${{ secrets.KEYSTORE_PASSWORD }} -keypass ${{ secrets.KEYSTORE_PASSWORD_ALIAS }} -sigalg SHA256withRSA -digestalg SHA-256 -signedjar build/app/outputs/bundle/release/app-release-signed.aab build/app/outputs/bundle/release/*.aab android
+        run: jarsigner -keystore $RUNNER_TEMP/my_production.keystore -storepass ${{ secrets.KEYSTORE_PASSWORD }} -keypass ${{ secrets.KEY_PASSWORD }} -sigalg SHA256withRSA -digestalg SHA-256 -signedjar build/app/outputs/bundle/release/app-release-signed.aab build/app/outputs/bundle/release/*.aab android
+
 
       # Upload generated APK to the artifacts.
       - name: Upload APK
