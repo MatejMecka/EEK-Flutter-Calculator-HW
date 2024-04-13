@@ -1,47 +1,63 @@
 name: Flutter CI
 
 # This workflow is triggered on pushes to the repository.
-
 on:
   push:
     branches:
-    - main
-    
+      - main
+
 jobs:
   build:
     # This job will run on ubuntu virtual machine
     runs-on: ubuntu-latest
     steps:
-    
-    # Setup Java environment in order to build the Android app.
-    - uses: actions/checkout@v1
-    - uses: actions/setup-java@v1
-      with:
-        java-version: '12.x'
-    
-    # Setup the flutter environment.
-    - uses: subosito/flutter-action@v1
-      with:
-        channel: 'beta' # 'dev', 'alpha', default to: 'stable'
-        # flutter-version: '1.12.x' # you can also specify exact version of flutter
-    
-    # Get flutter dependencies.
-    - run: flutter pub get
-    
-    # Build APK.
-    - run: flutter build apk
-    
-    # Build AAB.
-    - run: flutter build appbundle
-    
-    # Upload generated APK to the artifacts.
-    - uses: actions/upload-artifact@v1
-      with:
-        name: release-apk
-        path: build/app/outputs/apk/release/app-release.apk
-    
-    # Upload generated AAB to the artifacts.
-    - uses: actions/upload-artifact@v1
-      with:
-        name: release-aab
-        path: build/app/outputs/bundle/release/app-release.aab
+      # Setup Java environment in order to build the Android app.
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+
+      - name: Create the Keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          # import keystore from secrets
+          echo $KEYSTORE_BASE64 | base64 -d > $RUNNER_TEMP/my_production.keystore
+
+      # Setup the flutter environment.
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          channel: 'stable' # 'dev', 'alpha', default to: 'stable'
+         
+      # Get flutter dependencies.
+      - name: Get dependencies
+        run: flutter pub get
+
+      # Build APK.
+      - name: Build APK
+        run: flutter build apk
+
+      # Build AAB.
+      - name: Build AAB
+        run: flutter build appbundle --release
+
+      - name: Sign Android App Bundle
+        run: jarsigner -keystore $RUNNER_TEMP/my_production.keystore -storepass ${{ secrets.KEYSTORE_PASSWORD }} -keypass ${{ secrets.KEYSTORE_PASSWORD_ALIAS }} -sigalg SHA256withRSA -digestalg SHA-256 -signedjar build/app/outputs/bundle/release/app-release-signed.aab build/app/outputs/bundle/release/*.aab android
+
+      # Upload generated APK to the artifacts.
+      - name: Upload APK
+        uses: actions/upload-artifact@v1
+        with:
+          name: release-apk
+          path: build/app/outputs/apk/release/app-release.apk
+
+      # Upload generated AAB to the artifacts.
+      - name: Upload AAB
+        uses: actions/upload-artifact@v1
+        with:
+          name: release-aab
+          path: build/app/outputs/bundle/release/app-release.aab
